@@ -1,33 +1,15 @@
-CentOS一键安装Nginx
+首先，从GitHub仓库下载nginx.sh脚本：
+wget https://raw.githubusercontent.com/helloxz/nginx-cdn/master/nginx.sh
+接下来，授予脚本执行权限并运行它：
+chmod + x nginx.sh
+重写 nginx.sh
+脚本会自动检测系统版本并根据系统类型（CentOS 6或CentOS 7）选择编译安装或二进制安装。编译安装大约需要10分钟，而二进制安装通常需要2分钟左右。
 
-环境要求
-CentOS 6/7
-当前版本
-nginx/1.18
-已编译模块
---with-stream
---with-http_stub_status_module
---with-http_v2_module
---使用-http_ssl_模块
---with-http_gzip_static_module
---with-http_realip_module
---with-http_slice_module
---with-pcre-jit
-pcre-8.39
-zlib-1.2.11
-openssl-1.1.1
-ngx_http_substitutions_filter_module
-ngx_cache_purge
-ngx_brotli
-安装
-wget https://raw.githubusercontent.com/helloxz/nginx-cdn/master/nginx.sh && bash nginx.sh
-如果是CentOS 6的系统，请选择编译安装。
-CentOS 7 可选择编译安装或二进制安装。
-编译安装10分钟左右，二进制安装通常需要2分钟左右。
-命令
-安装完成后执行命令 source /etc/profile 让环境变量立即生效，或重新打开终端。
+安装完成后，执行以下命令使环境变量立即生效，或者重新打开终端：
 
-启动nginx：nginx
-停止nginx：nginx -s stop
-重载nginx：nginx -s reload
-语法检测：nginx -t
+源 /etc/profile
+现在，你可以使用以下命令来管理Nginx：
+启动Nginx：nginx
+停止Nginx：nginx -s stop
+重载Nginx配置：nginx -s reload
+查看Nginx配置语法：nginx -t
