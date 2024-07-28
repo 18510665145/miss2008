@@ -1,39 +1,39 @@
-#!/bin/bash
-############### CentOS一键安装Nginx脚本 ###############
-#Author:missrian2008
-#Update:2024-7-28
-#Github:
-####################### END #######################
+/bin/bash #!/bin/bash#!/bin/bash
+############## CentOS一键安装Nginx脚本##############
+#作者：missrian2008
+#更新日期：2024-7-28
+#Github：
+＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃ 结尾 ＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃＃
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/sbin
-export PATH
+导出路径
 
-dir='/usr/local/'
+目录='/usr/local/'
 nginx_version='1.18'
 openssl_version='1.1.1g'
 pcre_version='8.43'
 
-# 函数定义
-function check_os() {
-    if test -e "/etc/redhat-release"; then
-        yum -y install gcc gcc-c++ perl unzip libmaxminddb-devel gd-devel
-    elif test -e "/etc/debian_version"; then
-        apt-get -y update
-        apt-get -y install curl wget perl unzip build-essential libmaxminddb-dev libgd-dev
-    else
-        echo "当前系统不支持！"
-    fi
+#函数定义
+函数 check_os() {
+    如果测试-e“ / etc / redhat-release”;那么
+        yum -y 安装 gcc gcc-c++ perl 解压缩 libmaxminddb-devel gd-devel
+    elif test -e“/etc/debian_version”; 然后
+        apt-get -y 更新
+        apt-get -y 安装 curl wget perl 解压缩 build-essential libmaxminddb-dev libgd-dev
+    别的
+        echo “当前系统不支持！”
+    菲
 }
 
-function get_ip() {
-    osip=$(curl -4s https://api.ip.sb/ip)
-    echo $osip
+函数 get_ip() {
+    osip秒 https://api.ip.sb/ip)
+    回显$osip
 }
 
-function chk_firewall() {
-    if [ -e "/etc/sysconfig/iptables" ]; then
-        iptables -I INPUT -p tcp --dport 80 -j ACCEPT
-        iptables -I INPUT -p tcp --dport 443 -j ACCEPT
+函数 chk_firewall() {
+    如果 [ -e “/etc/sysconfig/iptables” ]; 那么
+        iptables -I 输入 -p tcp --dport 80 -j 接受-j 接受
+        iptables -I 输入 -p tcp --dport 443 -j-p--dport 443 -j
         service iptables save
         service iptables restart
     else
