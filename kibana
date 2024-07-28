@@ -1,1 +1,133 @@
+#!/bin/bash
+# auth:missrian2008
+# version:v1.1
+# func:kibana 6.0.1/6.2.4/6.3.1 安装
 
+# 定义安装目录、及日志信息
+. /etc/init.d/functions
+[ $(id -u) != "0" ] && echo "Error: You must be root to run this script" && exit 1
+export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+download_path=/tmp/kibana_install/
+install_log_name=install_kibana.log
+env_file=/etc/profile.d/kibana.sh
+install_log_path=/var/log/appinstall/
+install_path=/usr/local/
+software_config_file=${install_path}kibana/config/kibana.yml
+
+clear
+echo "##########################################"
+echo "#                                        #"
+echo "#   安装 kibana 6.0.1/6.2.4/6.3.1        #"
+echo "#                                        #"
+echo "##########################################"
+echo "1: Install kibana 6.0.1"
+echo "2: Install kib7.2.4"
+echo "3: Install kibana 6.3.1"
+echo "4: EXIT"
+read -p "Please input your choice [1-4]: " softversion
+if [[ "${softversion}" =~ ^[1-4]+$ ]]; then
+    case ${softversion} in
+        1)
+            URL="https://anchnet-script.oss-cn-shanghai.aliyuncs.com/kibana/kibana-6.0.1-linux-x86_64.tar.gz"
+            ;;
+        2)
+            URL="https://anchnet-script.oss-cn-shanghai.aliyuncs.com/kibana/kibana-6.2.4-linux-x86_64.tar.gz"
+            ;;
+        3)
+            URL="https://anchnet-script.oss-cn-shanghai.aliyuncs.com/kibana/kibana-6.3.1-linux-x86_64.tar.gz"
+            ;;
+        4)
+            echo "Exiting..."
+            exit 0
+            ;;
+    esac
+else
+    echo "Invalid input! Please enter a number between 1 and 4."
+    exit 1
+fi
+
+output_msg() {
+    for msg in "$@"; do
+        action "$msg" /bin/true
+    done
+}
+
+check_yum_command() {
+    local cmd="$1"
+    local package="$2"
+    output_msg "Checking command: $cmd"
+    hash "$cmd" >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        echo "$(date +%F' '%H:%M:%S) Command $cmd is already installed." >>${install_log_path}${install_log_name}
+    else
+        yum -y install "$package" >/dev/null 2>&1
+        hash "$cmd" >/dev/null 2>&1
+        if [ $? -eq 0 ]; then
+            echo "$(date +%F' '%H:%M:%S) Successfully installed $package." >>${install_log_path}${install_log_name}
+        else
+            echo "$(date +%F' '%H:%M:%S) Failed to install $package." >>${install_log_path}${install_log_name}
+            exit 1
+        fi
+    fi
+}
+
+check_dir() {
+    for dirname in "$@"; do
+        [ -d "$dirname" ] || mkdir -p "$dirname" >/dev/null 2>&1
+        echo "$(date +%F' '%H:%M:%S) Directory $dirname check success!" >>${install_log_path}${install_log_name}
+    done
+}
+
+download_file() {
+    output_msg "Downloading source code package"
+    mkdir -p "$download_path"
+    wget "$1" -c -P "$download_path" &> /dev/null
+    if [ $? -eq 0 ]; then
+        echo "$(date +%F' '%H:%M:%S) $1 download success!" >>${install_log_path}${install_log_name}
+    else
+        echo "$(date +%@' '%H:%M:%S) $1 download failed!" >>${install_log_path}${install_log_name}
+        exit 1
+    fi
+}
+
+extract_file() {
+    local file="$1"
+    output_msg "Extracting source code"
+    if [[ "${file##*.}" == "gz" ]]; then
+        tar -zxf "$file" -C "$install_path" && echo "$(date +%F' '%H:%M:%S) $file extracted successfully, path is $install_path" >>${install_log_path}${install_log_name}
+    elif [[ "${file##*.}" == "zip" ]]; then
+        unzip -q "$file" -d "$install_path" && echo "$(date +%F' '%H:%M:%S) $file extracted successfully, path is $install_path" >>${install_log_path}${install_log_name}
+    else
+        echo "$(date +%F' '%H:%M:%S) $file type error, extraction failed!" >>${install_log_path}${install_log_name}
+        exit 1
+    fi
+}
+
+config_env() {
+    output_msg "Configuring environment variables"
+    echo "export PATH=\$PATH:$1" >"$env_file"
+    source "$env_file" && echo "$(date +%F' '%H:%M:%S) Environment variables configured successfully." >>${install_log_path}${install_log_name}
+}
+
+add_config() {
+    cat > "$1" <<EOF
+server.port: 5601
+server.host: "0.0.0.0"
+elasticsearch.url: "http://127.0.0.1:9200"
+EOF
+}
+
+main() {
+    check_dir "$install_log_path" "$install_path"
+    check_yum_command wget wget
+    download_file "$URL"
+
+    software_name=$(basename "$URL" .tar.gz)
+    extract_file "${download_path}${software_name}.tar.gz"
+    rm -rf "$download_path"
+    ln -s "$install_path$software_name" "$install_path"kibana
+    add_config "$software_config_file"
+    config_env "$install_path"kibana/bin
+}
+
+main
