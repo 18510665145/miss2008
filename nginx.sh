@@ -1,8 +1,8 @@
 #!/bin/bash
 ############### CentOS一键安装Nginx脚本 ###############
-#Author:xiaoz.me
-#Update:2020-11-15
-#Github:https://github.com/helloxz/nginx-cdn
+#Author:missrian2008
+#Update:2024-7-29
+
 ####################### END #######################
 
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin:/sbin
