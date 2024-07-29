@@ -100,7 +100,7 @@ function CompileInstall() {
     mv ngx_cache_purge-2.3 ngx_cache_purge
 
     wget http://soft.xiaoz.org/nginx/ngx_brotli.tar.gz
-    tar -zxvf ngx_brot�li.tar.gz
+    tar -zxvf nginx/ngx_brotli.tar.gz
 
     cd /usr/local
     wget https://wget.ovh/nginx/xcdn-${nginx_version}.tar.gz
@@ -216,4 +216,4 @@ case $istype in
     ;;
     *)
         echo '参数错误！'
-埃萨克
+
